@@ -4,6 +4,7 @@
 #include <chrono>
 #include <mutex>
 #include <cmath>
+#include <math.h>
 
 class Timer {
 	public:
@@ -29,6 +30,19 @@ private:
 	std::chrono::time_point<std::chrono::high_resolution_clock> m_StartTimepoint;
 };
 
+bool square(int n) {
+
+	// If ceil and floor are equal
+	// the number is a perfect
+	// square
+	if (ceil((double)sqrt(n)) == floor((double)sqrt(n))) {
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
 bool isPerfectSquare(long double x) {
 	// Find floating point value of
 	// square root of x.
@@ -44,6 +58,8 @@ bool isPerfectSquare(long double x) {
 	// else return false if n<0
 	return false;
 }
+
+uint_fast64_t g_cycles = 0;
 
 void thr_bench_nines(uint_fast32_t start, uint_fast32_t offset, uint_fast32_t threadcount) {
 	uint_fast32_t a, b, c, d, e, f, g, h, i;
@@ -98,6 +114,8 @@ void thr_bench_nines(uint_fast32_t start, uint_fast32_t offset, uint_fast32_t th
 	std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<double> t_time = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
 	double cps = (double)cycles / t_time.count();
+
+	g_cycles += cycles;
 
 	std::cout << std::fixed;
 	std::cout << "best:" << best;
@@ -168,7 +186,7 @@ int main()
 {
 	
 	const uint_fast32_t numthreads = 15;
-	const uint_fast32_t e = 425;
+	const uint_fast32_t e = 850;
 
 	std::vector<std::thread> thr(numthreads);
 
@@ -178,6 +196,11 @@ int main()
 
 	for (uint_fast32_t i = 0; i < numthreads; i++) {
 		thr[i] = std::thread(thr_bench_nines, e, i, numthreads);
+
+	}
+
+	for (uint_fast32_t i = 0; i < numthreads; i++) {
+		
 		thr[i].join();
 	}
 	std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
@@ -185,5 +208,7 @@ int main()
 
 	std::cout << "time:" << t_time.count();
 
-	std::cout << " done" << "\n";
+	std::cout << " cycles:" << g_cycles << "\n";
+
+	std::cout << "cps:" << (g_cycles / t_time.count()) / 1000000 << "m\n";
 }
