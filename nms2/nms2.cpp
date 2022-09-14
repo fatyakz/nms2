@@ -45,18 +45,17 @@ bool isPerfectSquare(long double x) {
 	return false;
 }
 
-void thr_bench_nines(long start, long offset, long threadcount) {
-	long a, b, c, d, e, f, g, h, i;
-	long cycles = 0; long matches = 0; long best = 0;
+void thr_bench_nines(uint_fast32_t start, uint_fast32_t offset, uint_fast32_t threadcount) {
+	uint_fast32_t a, b, c, d, e, f, g, h, i;
+	uint_fast64_t cycles = 0; uint_fast32_t matches = 0; uint_fast32_t best = 0;
 	e = start * start;
-	long nmlimit = e;
-	long bestn = 0, bestm = 0;
+	unsigned long long int nmlimit = e;
+	unsigned long long int bestn = 0, bestm = 0;
 	std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
 	
-	for (long n = 1; n < nmlimit; n++) {
-
-		for (long m = 1 + offset; m < nmlimit; m += threadcount) {
-			if (n == m) { goto end; }
+	for (unsigned long long int n = 1; n < nmlimit; n++) {
+		for (unsigned long long int m = 1 + offset; m < nmlimit; m += threadcount) {
+			//if (n == m) { goto end; }
 			if (n + m >= e) { break; }
 			
 			a = e + n;
@@ -83,6 +82,7 @@ void thr_bench_nines(long start, long offset, long threadcount) {
 			i = e - n;
 			if (!isPerfectSquare(i)) { goto end; }
 			matches++;
+
 		end:
 			cycles++;
 			
@@ -107,6 +107,7 @@ void thr_bench_nines(long start, long offset, long threadcount) {
 	std::cout << " time:" << t_time.count();
 	std::cout << " cps:" << cps / 1000000 << "m\n";
 }
+
 void thr_all(long start, long offset, long threadcount) {
 	long a, b, c, d, e, f, g, h, i;
 	long cycles = 0; long matches = 0; long best = 0;
@@ -122,29 +123,22 @@ void thr_all(long start, long offset, long threadcount) {
 			if (n + m >= e) { break; }
 
 			a = e + n;
-			if (!isPerfectSquare(a)) { goto end; }
-			matches++;
 			b = e - n - m;
-			if (!isPerfectSquare(b)) { goto end; }
-			matches++;
 			c = e + n;
-			if (!isPerfectSquare(c)) { goto end; }
-			matches++;
 			d = e - n + m;
-			if (!isPerfectSquare(d)) { goto end; }
-			matches++;
 			f = e + n - m;
-			if (!isPerfectSquare(f)) { goto end; }
-			matches++;
 			g = e - n;
-			if (!isPerfectSquare(g)) { goto end; }
-			matches++;
 			h = e + n + m;
-			if (!isPerfectSquare(h)) { goto end; }
-			matches++;
 			i = e - n;
-			if (!isPerfectSquare(i)) { goto end; }
-			matches++;
+			
+			if (isPerfectSquare(i)) { matches++; }
+			if (isPerfectSquare(h)) { matches++; }
+			if (isPerfectSquare(g)) { matches++; }
+			if (isPerfectSquare(f)) { matches++; }
+			if (isPerfectSquare(d)) { matches++; }
+			if (isPerfectSquare(c)) { matches++; }
+			if (isPerfectSquare(b)) { matches++; }
+			if (isPerfectSquare(a)) { matches++; }
 		end:
 			cycles++;
 
@@ -169,22 +163,12 @@ void thr_all(long start, long offset, long threadcount) {
 	std::cout << " time:" << t_time.count();
 	std::cout << " cps:" << cps / 1000000 << "m\n";
 }
-//long double sqrt(long double n) {
-//	long double x = n / 2;
-//	while (1) {
-//		x = 0.5 * (x + (n / x));
-//		if (x * x >= n - 0.0000001 && x * x <= n + 0.0000001) {
-//			break;
-//		}
-//	}
-//	return x;
-//}
 
 int main()
 {
 	
-	long numthreads = 15;
-	long e = 425;
+	uint_fast32_t numthreads = 15;
+	uint_fast32_t e = 425;
 
 	std::vector<std::thread> thr(numthreads);
 
@@ -192,8 +176,8 @@ int main()
 
 	std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
 
-	for (long i = 0; i < numthreads; i++) {
-		thr[i] = std::thread(thr_all, e, i, numthreads);
+	for (uint_fast32_t i = 0; i < numthreads; i++) {
+		thr[i] = std::thread(thr_bench_nines, e, i, numthreads);
 		thr[i].join();
 	}
 	std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
