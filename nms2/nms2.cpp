@@ -49,12 +49,12 @@ void thr_bench_nines(uint_fast32_t start, uint_fast32_t offset, uint_fast32_t th
 	uint_fast32_t a, b, c, d, e, f, g, h, i;
 	uint_fast64_t cycles = 0; uint_fast32_t matches = 0; uint_fast32_t best = 0;
 	e = start * start;
-	unsigned long long int nmlimit = e;
-	unsigned long long int bestn = 0, bestm = 0;
+	uint_fast32_t nmlimit = e;
+	uint_fast32_t bestn = 0, bestm = 0;
 	std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
 	
-	for (unsigned long long int n = 1; n < nmlimit; n++) {
-		for (unsigned long long int m = 1 + offset; m < nmlimit; m += threadcount) {
+	for (uint_fast32_t n = 1; n < nmlimit; n++) {
+		for (uint_fast32_t m = 1 + offset; m < nmlimit; m += threadcount) {
 			//if (n == m) { goto end; }
 			if (n + m >= e) { break; }
 			
@@ -167,8 +167,8 @@ void thr_all(long start, long offset, long threadcount) {
 int main()
 {
 	
-	uint_fast32_t numthreads = 15;
-	uint_fast32_t e = 425;
+	const uint_fast32_t numthreads = 15;
+	const uint_fast32_t e = 425;
 
 	std::vector<std::thread> thr(numthreads);
 
