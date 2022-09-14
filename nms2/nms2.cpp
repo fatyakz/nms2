@@ -186,7 +186,7 @@ int main()
 {
 	
 	const uint_fast32_t numthreads = 15;
-	const uint_fast32_t e = 850;
+	uint_fast32_t e = 425;
 
 	std::vector<std::thread> thr(numthreads);
 
@@ -206,9 +206,8 @@ int main()
 	std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<double> t_time = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
 
-	std::cout << "time:" << t_time.count();
-
-	std::cout << " cycles:" << g_cycles << "\n";
-
+	std::cout << "time:" << t_time.count() << "\n";
+	std::cout << "cycles:" << g_cycles << "\n";
 	std::cout << "cps:" << (g_cycles / t_time.count()) / 1000000 << "m\n";
+	std::cout << "e:" << e << "m\n";
 }
