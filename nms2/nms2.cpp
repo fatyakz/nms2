@@ -50,7 +50,7 @@ void thr_bench_nines(long start, long offset, long threadcount) {
 	long cycles = 0; long matches = 0; long best = 0;
 	e = start * start;
 	long nmlimit = e;
-	
+	long bestn = 0, bestm = 0;
 	std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
 	
 	for (long n = 1; n < nmlimit; n++) {
@@ -58,7 +58,7 @@ void thr_bench_nines(long start, long offset, long threadcount) {
 		for (long m = 1 + offset; m < nmlimit; m += threadcount) {
 			if (n == m) { goto end; }
 			if (n + m >= e) { break; }
-			matches = 1;
+			
 			a = e + n;
 			if (!isPerfectSquare(a)) { goto end; }
 			matches++;
@@ -84,8 +84,14 @@ void thr_bench_nines(long start, long offset, long threadcount) {
 			if (!isPerfectSquare(i)) { goto end; }
 			matches++;
 		end:
-			if (matches > best) { best = matches; }
 			cycles++;
+			
+
+			if (matches > best) {
+				best = matches;
+				bestn = n; bestm = m;
+			}
+			matches = 1;
 		}
 	}
 
@@ -95,6 +101,8 @@ void thr_bench_nines(long start, long offset, long threadcount) {
 
 	std::cout << std::fixed;
 	std::cout << "best:" << best;
+	std::cout << " n:" << bestn;
+	std::cout << " m:" << bestm;
 	std::cout << " cycles:" << cycles / 1000000 << "m";
 	std::cout << " time:" << t_time.count();
 	std::cout << " cps:" << cps / 1000000 << "m\n";
