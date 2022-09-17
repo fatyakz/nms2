@@ -230,7 +230,7 @@ void thr_ifless(uint_fast32_t start, uint_fast32_t offset, uint_fast32_t threadc
 	e = start * start;
 	uint_fast32_t nmlimit = e;
 	uint_fast32_t bestn = 0, bestm = 0;
-	uint_fast32_t sr = 0;
+	long long sr = 0;
 	std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
 
 	for (uint_fast32_t n = 4; n < nmlimit; n++) {
@@ -247,28 +247,28 @@ void thr_ifless(uint_fast32_t start, uint_fast32_t offset, uint_fast32_t threadc
 			h = e + n + m;
 			i = e - n;
 			
-			sr = (double)sqrt(a);
+			sr = (long double)sqrt(a);
 			matches += (sr * sr == a);
 
-			sr = (double)sqrt(b);
+			sr = (long double)sqrt(b);
 			matches += (sr * sr == b);
 
-			sr = (double)sqrt(c);
+			sr = (long double)sqrt(c);
 			matches += (sr * sr == c);
 
-			sr = (double)sqrt(d);
+			sr = (long double)sqrt(d);
 			matches += (sr * sr == d);
 
-			sr = (double)sqrt(f);
+			sr = (long double)sqrt(f);
 			matches += (sr * sr == f);
 
-			sr = (double)sqrt(g);
+			sr = (long double)sqrt(g);
 			matches += (sr * sr == g);
 
-			sr = (double)sqrt(h);
+			sr = (long double)sqrt(h);
 			matches += (sr * sr == h);
 
-			sr = (double)sqrt(i);
+			sr = (long double)sqrt(i);
 			matches += (sr * sr == i);
 
 			best += (matches - best) * (matches >= best);
