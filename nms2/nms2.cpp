@@ -372,7 +372,7 @@ int main()
 
 	
 	for (uint_fast32_t t = 0; t < numthreads; t++) {
-		thr[t] = std::thread(thr_ifless, e, t, numthreads);
+		thr[t] = std::thread(thr_all, e, t, numthreads);
 	}
 
 
