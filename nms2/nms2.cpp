@@ -233,7 +233,7 @@ void thr_ifless(uint_fast32_t start, uint_fast32_t offset, uint_fast32_t threadc
 	uint_fast32_t sr = 0;
 	std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
 
-	for (uint_fast32_t n = 1; n < nmlimit; n++) {
+	for (uint_fast32_t n = 4; n < nmlimit; n++) {
 		for (uint_fast32_t m = 1 + offset; m < nmlimit; m += threadcount) {
 
 			if (n + m >= e) { break; }
