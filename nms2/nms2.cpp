@@ -262,10 +262,11 @@ void thr_nines(uint_fast32_t start, uint_fast32_t offset, uint_fast32_t threadco
 	tex.lock();
 	std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<double> t_time = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
+
+	cycles = (e * e * e * e) / 2;
+
 	double cps = (double)cycles / t_time.count();
 
-	g_cycles += cycles;
-	
 	std::cout << std::fixed;
 	std::cout << "best:" << best;
 	std::cout << " n:" << bestn;
