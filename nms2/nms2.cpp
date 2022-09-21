@@ -274,6 +274,11 @@ void thr_nines(uint_fast32_t start, uint_fast32_t offset, uint_fast32_t threadco
 	std::cout << " cycles:" << cycles / 1000000 << "m";
 	std::cout << " time:" << t_time.count();
 	std::cout << " cps:" << cps / 1000000 << "m\n";
+
+	if (best > gbest) {
+		gbest = best; gbestm = bestm; gbestn = bestn;
+	}
+
 	tex.unlock();
 }
 
