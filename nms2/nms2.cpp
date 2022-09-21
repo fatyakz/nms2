@@ -4,6 +4,59 @@
 #include <chrono>
 #include <mutex>
 #include <math.h>
+#include <iomanip>
+
+void pSquare(long e, long n, long m) {
+
+	
+
+	std::vector<long> squares(9);
+	std::vector<long double> roots(9);
+
+	int longest = 0;
+
+	//build squares
+	squares[4] = e * e;
+
+	squares[0] = e + n;
+	squares[1] = e - n - m;
+	squares[2] = e + n;
+	squares[3] = e - n + m;
+	
+	squares[5] = e + n - m;
+	squares[6] = e - n;
+	squares[7] = e + n + m;
+	squares[8] = e - n;
+
+	//copy sqrt of squares into roots
+	for (int i = 0; i < squares.size(); i++) {
+		
+		roots[i] = sqrt(squares[i]);
+
+		//find longest digits
+		if (sizeof(squares[i] > longest)) {
+			longest = sizeof(squares[i]);
+		}
+		if (sizeof(roots[i] > longest)) {
+			longest = sizeof(roots[i]);
+		}
+	}
+
+	std::cout << std::setprecision(8);
+	//std::cout << std::setw(longest);
+	std::cout << std::setw(12);
+	std::cout.setf(std::ios::fixed, std::ios::floatfield);
+
+	std::cout << std::setw(12)  << roots[0] << ":" << roots[1] << ":" << roots[2] << " -> "
+		<< squares[0] << ":" << squares[1] << ":" << squares[2] << "\n"
+		<< roots[3] << ":" << roots[4] << ":" << roots[5] << " -> "
+		<< squares[3] << ":" << squares[4] << ":" << squares[5] << "\n"
+		<< roots[6] << ":" << roots[7] << ":" << roots[8] << " -> "
+		<< squares[6] << ":" << squares[7] << ":" << squares[8] << "\n";
+
+
+
+}
 
 class Timer {
 	public:
@@ -223,6 +276,83 @@ void thr_nines(uint_fast32_t start, uint_fast32_t offset, uint_fast32_t threadco
 	tex.unlock();
 }
 
+void thr_vector(uint_fast32_t start, uint_fast32_t offset, uint_fast32_t threadcount) {
+	std::mutex tex;
+	uint_fast32_t a, b, c, d, e, f, g, h, i;
+	uint_fast64_t cycles = 0; uint_fast32_t matches = 0; uint_fast32_t best = 0;
+	e = start * start;
+	uint_fast32_t nmlimit = e;
+	uint_fast32_t bestn = 0, bestm = 0;
+	std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
+
+	std::vector<uint_fast32_t> squares;
+	squares.resize(nmlimit * nmlimit);
+
+	for (uint_fast32_t n = 1; n < nmlimit; n++) {
+		for (uint_fast32_t m = 1 + offset; m < nmlimit; m += threadcount) {
+			//if (n == m) { goto end; }
+			if (n + m >= e) { break; }
+
+			a = e + n;
+			b = e - n - m;
+			c = e + n;
+			d = e - n + m;
+			f = e + n - m;
+			g = e - n;
+			h = e + n + m;
+			i = e - n;
+
+			squares[n + m + 0] = a;
+			squares[n + m + 1] = b;
+			squares[n + m + 2] = c;
+			squares[n + m + 3] = d;
+			squares[n + m + 4] = e;
+			squares[n + m + 5] = f;
+			squares[n + m + 6] = g;
+			squares[n + m + 7] = h;
+			squares[n + m + 8] = i;
+			squares[n + m + 9] = n;
+			squares[n + m + 10] = m;
+		
+		}
+	}
+
+	for (uint_fast32_t n = 0; n < squares.size(); n += 11) {
+
+		if (isPerfectSquare(squares[n + 0])) { matches++; }
+		if (isPerfectSquare(squares[n + 1])) { matches++; }
+		if (isPerfectSquare(squares[n + 2])) { matches++; }
+		if (isPerfectSquare(squares[n + 3])) { matches++; }
+		if (isPerfectSquare(squares[n + 5])) { matches++; }
+		if (isPerfectSquare(squares[n + 6])) { matches++; }
+		if (isPerfectSquare(squares[n + 7])) { matches++; }
+		if (isPerfectSquare(squares[n + 8])) { matches++; }
+
+	end:
+		if (matches > best) {
+			best = matches;
+			bestn = squares[n + 10]; bestm = squares[n + 9];
+		}
+		matches = 1;
+	}
+
+	tex.lock();
+	std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<double> t_time = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
+	double cps = (double)cycles / t_time.count();
+
+	g_cycles += cycles;
+
+	std::cout << std::fixed;
+	std::cout << "best:" << best;
+	std::cout << " n:" << bestn;
+	std::cout << " m:" << bestm;
+	std::cout << " cycles:" << cycles / 1000000 << "m";
+	std::cout << " time:" << t_time.count();
+	std::cout << " cps:" << cps / 1000000 << "m\n";
+	tex.unlock();
+}
+
 void thr_ifless(uint_fast32_t start, uint_fast32_t offset, uint_fast32_t threadcount) {
 	std::mutex tex;
 	uint_fast32_t a, b, c, d, e, f, g, h, i;
@@ -296,6 +426,9 @@ void thr_ifless(uint_fast32_t start, uint_fast32_t offset, uint_fast32_t threadc
 	std::cout << " cycles:" << cycles / 1000000 << "m";
 	std::cout << " time:" << t_time.count();
 	std::cout << " cps:" << cps / 1000000 << "m\n";
+
+	if (best >= gbest) { gbest = best; gbestn = bestn; gbestm = bestm; }
+
 	tex.unlock();
 }
 
@@ -346,6 +479,8 @@ void thr_all(long start, long offset, long threadcount) {
 	std::chrono::duration<double> t_time = std::chrono::duration_cast<std::chrono::duration<double>>(t2 - t1);
 	double cps = (double)cycles / t_time.count();
 
+	if (best >= gbest) { gbest = best; gbestn = bestn; gbestm = bestm; }
+
 	std::cout << std::fixed;
 	std::cout << "best:" << best;
 	std::cout << " n:" << bestn;
@@ -357,7 +492,7 @@ void thr_all(long start, long offset, long threadcount) {
 
 int main()
 {
-	
+
 	const uint_fast32_t numthreads = 15;
 	
 
@@ -372,7 +507,7 @@ int main()
 
 	
 	for (uint_fast32_t t = 0; t < numthreads; t++) {
-		thr[t] = std::thread(thr_ifless, e, t, numthreads);
+		thr[t] = std::thread(thr_nines, e, t, numthreads);
 	}
 
 
@@ -392,4 +527,6 @@ int main()
 	std::cout << "cps:" << (g_cycles / t_time.count()) / 1000000 << "m\n";
 	std::cout << "e:" << e << "m\n";
 	std::cout << "best:" << gbest << " n:" << gbestn << " m:" << gbestm << "\n";
+
+	pSquare(e, gbestn, gbestm);
 }
